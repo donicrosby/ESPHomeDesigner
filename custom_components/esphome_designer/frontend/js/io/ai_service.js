@@ -27,6 +27,11 @@ export class AIService {
         return AppState.settings;
     }
 
+    getOpenAIBaseUrl() {
+        const custom = (AppState.settings.ai_base_url_openai || "").trim().replace(/\/+$/, "");
+        return custom || 'https://api.openai.com/v1';
+    }
+
     async fetchModels(provider, apiKey) {
         if (provider === 'minimax' || provider === 'glm') {
             return AIService.STATIC_MODELS[provider] || [];
@@ -41,11 +46,16 @@ export class AIService {
                 const data = await response.json();
                 return data.data.map(m => ({ id: m.id, name: m.name, context: m.context_length }));
             } else if (provider === 'openai') {
-                const response = await fetch('https://api.openai.com/v1/models', {
+                const baseUrl = this.getOpenAIBaseUrl();
+                const response = await fetch(`${baseUrl}/models`, {
                     headers: { 'Authorization': `Bearer ${apiKey}` }
                 });
                 const data = await response.json();
-                return data.data.filter(m => m.id.startsWith('gpt-')).map(m => ({ id: m.id, name: m.id }));
+                const isCustom = baseUrl !== 'https://api.openai.com/v1';
+                const models = isCustom
+                    ? data.data
+                    : data.data.filter(m => m.id.startsWith('gpt-'));
+                return models.map(m => ({ id: m.id, name: m.id }));
             } else if (provider === 'gemini') {
                 try {
                     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
@@ -240,6 +250,8 @@ Respond ONLY with valid JSON containing the updated "widgets" array for the curr
     }
 
     async callOpenAI(apiKey, model, system, user) {
+        const baseUrl = this.getOpenAIBaseUrl();
+
         // Check if this is a GPT-5 model (uses newer API features)
         const isGpt5 = model && model.toLowerCase().includes('gpt-5');
 
@@ -281,7 +293,7 @@ Respond ONLY with valid JSON containing the updated "widgets" array for the curr
             requestBody.max_tokens = 8192;
         }
 
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetch(`${baseUrl}/chat/completions`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${apiKey}`,

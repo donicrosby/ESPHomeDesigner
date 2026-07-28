@@ -1,6 +1,6 @@
 import { Logger } from '../../utils/logger.js';
 
-/** @typedef {'ai_api_key_gemini'|'ai_api_key_openai'|'ai_api_key_openrouter'|'ai_api_key_minimax'|'ai_api_key_glm'} SecretKey */
+/** @typedef {'ai_api_key_gemini'|'ai_api_key_openai'|'ai_api_key_openrouter'|'ai_api_key_minimax'|'ai_api_key_glm'|'ai_base_url_openai'} SecretKey */
 
 /** @returns {Storage | null} */
 function getWebStorage() {
@@ -19,7 +19,8 @@ export class SecretsStore {
             ai_api_key_openai: "",
             ai_api_key_openrouter: "",
             ai_api_key_minimax: "",
-            ai_api_key_glm: ""
+            ai_api_key_glm: "",
+            ai_base_url_openai: ""
         };
         this.loadFromLocalStorage();
     }
@@ -53,7 +54,7 @@ export class SecretsStore {
             /** @type {Partial<Record<SecretKey, string>>} */
             const keysToSave = {};
             Object.keys(this.keys).forEach((/** @type {string} */ key) => {
-                if (key.startsWith('ai_api_key_')) {
+                if (key.startsWith('ai_api_key_') || key.startsWith('ai_base_url_')) {
                     keysToSave[/** @type {SecretKey} */ (key)] = this.keys[/** @type {SecretKey} */ (key)];
                 }
             });

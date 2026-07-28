@@ -45,7 +45,8 @@ describe('SecretsStore', () => {
             ai_api_key_openai: '',
             ai_api_key_openrouter: 'router-key',
             ai_api_key_minimax: '',
-            ai_api_key_glm: ''
+            ai_api_key_glm: '',
+            ai_base_url_openai: ''
         });
     });
 

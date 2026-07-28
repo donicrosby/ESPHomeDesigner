@@ -340,7 +340,7 @@ export class AppStateFacade {
         const prefUpdates: Record<string, any> = {};
 
         Object.keys(newSettings).forEach((key) => {
-            if (key.startsWith('ai_api_key_')) {
+            if (key.startsWith('ai_api_key_') || key.startsWith('ai_base_url_')) {
                 secretUpdates[key] = newSettings[key];
             } else {
                 prefUpdates[key] = newSettings[key];

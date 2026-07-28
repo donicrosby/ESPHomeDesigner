@@ -88,6 +88,31 @@ describe('ai_service', () => {
         await expect(service.fetchModels('gemini', '')).resolves.toEqual([]);
     });
 
+    it('returns all models from a custom OpenAI base URL without gpt- filtering', async () => {
+        const service = new AIService();
+        mockAppState.settings = { ai_base_url_openai: 'http://localhost:4000/v1' };
+
+        fetch.mockResolvedValueOnce({
+            json: vi.fn().mockResolvedValue({
+                data: [
+                    { id: 'gpt-4o' },
+                    { id: 'claude-3-opus' },
+                    { id: 'llama-3.1-70b' },
+                    { id: 'text-embedding-3-small' }
+                ]
+            })
+        });
+
+        await expect(service.fetchModels('openai', 'litellm-key')).resolves.toEqual([
+            { id: 'gpt-4o', name: 'gpt-4o' },
+            { id: 'claude-3-opus', name: 'claude-3-opus' },
+            { id: 'llama-3.1-70b', name: 'llama-3.1-70b' },
+            { id: 'text-embedding-3-small', name: 'text-embedding-3-small' }
+        ]);
+
+        expect(fetch.mock.calls[0][0]).toBe('http://localhost:4000/v1/models');
+    });
+
     it('builds provider-specific request payloads for Gemini, OpenAI, and OpenRouter', async () => {
         const service = new AIService();
 

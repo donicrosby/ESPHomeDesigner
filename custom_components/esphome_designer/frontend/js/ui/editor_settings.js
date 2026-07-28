@@ -65,6 +65,7 @@ export class EditorSettings {
         this.aiProvider = getSelect('aiProvider');
         this.aiApiKeyGemini = getInput('aiApiKeyGemini');
         this.aiApiKeyOpenai = getInput('aiApiKeyOpenai');
+        this.aiBaseUrlOpenai = getInput('aiBaseUrlOpenai');
         this.aiApiKeyOpenrouter = getInput('aiApiKeyOpenrouter');
         this.aiApiKeyMinimax = getInput('aiApiKeyMinimax');
         this.aiApiKeyGlm = getInput('aiApiKeyGlm');
@@ -115,6 +116,7 @@ export class EditorSettings {
         if (this.aiProvider) this.aiProvider.value = settings.ai_provider || "gemini";
         if (this.aiApiKeyGemini) this.aiApiKeyGemini.value = settings.ai_api_key_gemini || "";
         if (this.aiApiKeyOpenai) this.aiApiKeyOpenai.value = settings.ai_api_key_openai || "";
+        if (this.aiBaseUrlOpenai) this.aiBaseUrlOpenai.value = settings.ai_base_url_openai || "";
         if (this.aiApiKeyOpenrouter) this.aiApiKeyOpenrouter.value = settings.ai_api_key_openrouter || "";
         if (this.aiApiKeyMinimax) this.aiApiKeyMinimax.value = settings.ai_api_key_minimax || "";
         if (this.aiApiKeyGlm) this.aiApiKeyGlm.value = settings.ai_api_key_glm || "";
@@ -313,6 +315,7 @@ export class EditorSettings {
         };
         bindAIKey('aiApiKeyGemini', 'ai_api_key_gemini');
         bindAIKey('aiApiKeyOpenai', 'ai_api_key_openai');
+        bindAIKey('aiBaseUrlOpenai', 'ai_base_url_openai');
         bindAIKey('aiApiKeyOpenrouter', 'ai_api_key_openrouter');
         bindAIKey('aiApiKeyMinimax', 'ai_api_key_minimax');
         bindAIKey('aiApiKeyGlm', 'ai_api_key_glm');
@@ -344,6 +347,13 @@ export class EditorSettings {
                 if (inputEl) {
                     apiKey = inputEl.value.trim();
                     AppState.updateSettings({ [`ai_api_key_${provider}`]: apiKey });
+                }
+
+                if (provider === 'openai') {
+                    const baseUrlEl = /** @type {HTMLInputElement | null} */ (document.getElementById('aiBaseUrlOpenai'));
+                    if (baseUrlEl) {
+                        AppState.updateSettings({ ai_base_url_openai: baseUrlEl.value.trim() });
+                    }
                 }
 
                 if (!apiKey) {
